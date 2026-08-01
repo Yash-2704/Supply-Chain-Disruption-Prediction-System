@@ -1,0 +1,29 @@
+{
+  "_note": "HAND-CURATED, human judgment — not derived from any filing content or heuristic. Maps each hyperscaler demand filer (by ticker) to the resource_id(s) its AI-infrastructure capex is judged relevant to. Revise deliberately; do not auto-generate. Every entry must keep a real _rationale sentence.",
+  "mappings": [
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft",
+      "resource_ids": ["gpu", "hbm", "dram", "nand"],
+      "_rationale": "Azure and its OpenAI partnership drive large purchases of Nvidia AI accelerators (GPU), the HBM stacked on them, server DRAM for AI hosts, and NAND for Azure's public storage tier."
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet/Google",
+      "resource_ids": ["gpu", "hbm", "dram", "nand"],
+      "_rationale": "Google Cloud buys Nvidia GPUs and HBM alongside its own TPUs, plus server DRAM and NAND for Cloud Storage, so its AI capex touches all four."
+    },
+    {
+      "ticker": "AMZN",
+      "name": "Amazon",
+      "resource_ids": ["gpu", "hbm", "dram", "nand"],
+      "_rationale": "AWS is the largest public cloud and storage provider, so its capex spans GPUs and HBM for AI instances, DRAM for compute, and heavy NAND for S3/EBS storage."
+    },
+    {
+      "ticker": "META",
+      "name": "Meta",
+      "resource_ids": ["gpu", "hbm", "dram"],
+      "_rationale": "Meta's capex is dominated by internal AI-training GPU clusters (GPU + HBM) and their server DRAM; NAND is excluded because Meta runs no third-party public storage cloud driving separate flash demand."
+    }
+  ]
+}

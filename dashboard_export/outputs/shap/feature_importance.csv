@@ -1,0 +1,11 @@
+feature,importance
+price_latest,3.990414508054358
+price_trend_4w,1.1670318236490604
+price_zscore_8w,0.6924593996058124
+forecast_point_1m,0.0
+forecast_interval_width_1m,0.0
+forecast_disagreement_1m,0.0
+forecast_unstable_flag,0.0
+signal_severity_mean_4w,0.1424499757591624
+signal_count_4w,0.6048852575585993
+hhi_country,2.60211252848981

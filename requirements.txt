@@ -1,0 +1,29 @@
+# Runtime + test dependencies for the ingestion pipeline.
+# Setup:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+gdeltdoc          # GDELT 2.0 DOC API wrapper (pulls in pandas); no API key needed
+requests          # NewsAPI /v2/everything HTTP calls
+edgartools        # SEC EDGAR client (XBRL facts + filing metadata); import name: `edgar`
+yfinance          # producer stock closes (market-sentiment proxy) -> price_series
+openpyxl          # parse the World Bank Pink Sheet .xlsx (used via pandas)
+rapidfuzz         # entity resolution layer 2: fuzzy producer-name matching
+sentence-transformers  # entity resolution layer 3: MiniLM semantic fallback (lazy-loaded)
+hdbscan           # clustering: density-based path for large-N corpora (>= 40 rows)
+chromadb          # clustering: embedded/local vector store for later RAG retrieval
+# LLM providers are all OpenAI-compatible chat APIs called via `requests`
+# (no per-provider SDKs). Order = Groq (primary) -> Mistral -> Cerebras, in
+# llm_extraction/llm_client.py. Keys from env: GROQ_API_KEY, MISTRAL_API_KEY,
+# CEREBRAS_API_KEY. Add rotation keys as GROQ_API_KEY_2, GROQ_API_KEY_3, ...
+# (Gemini removed: free tier only 5 req/day. OpenRouter removed: free pool 429'd.)
+prophet           # forecasting: primary model with native uncertainty intervals
+statsmodels       # forecasting: Holt-Winters (Holt linear trend) sanity-check point estimate
+lightgbm          # fusion model: gradient-boosted classifier (needs libomp: `brew install libomp`)
+shap              # fusion model: SHAP explainability (gated to real, sufficiently-large runs)
+scikit-learn      # fusion model: IsotonicRegression calibration + train/test split
+# Optional Phase-2 off-the-shelf models (all lazy-loaded; pipeline degrades gracefully if absent):
+chronos-forecasting  # zero-shot 3rd forecaster (Apache-2.0, CPU)
+transformers      # local FinBERT sentiment + bart-large-mnli zero-shot event_type
+tabpfn-client     # HOSTED TabPFN fusion learner via TABPFN_TOKEN (avoids local gated weights)
+# tabpfn          # local TabPFN alternative — needs browser license + gated HF weights (headless-unfriendly)
+streamlit         # dashboard UI: single-process app (streamlit run dashboard_ui/app.py)
+plotly            # dashboard UI: price-history line chart
+pytest            # test runner (tests also work under stdlib unittest)

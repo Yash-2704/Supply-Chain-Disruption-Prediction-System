@@ -1,0 +1,57 @@
+{
+  "_note": "Hand-authored real-world resource episodes — external domain knowledge, NOT derived from the database. Dates are APPROXIMATE (month-level). Each entry MUST carry a one-sentence justification. `episodes` are TIGHTENING periods (label=1); `negative_periods` are explicit NON-tightening / oversupply periods (label=0) so the classifier learns both classes. NAND now appears in BOTH: its 2023 glut is a clean negative, and its late-2024→2025 supply-cut + enterprise/AI-SSD recovery is a (supply-discipline-driven) tightening — the justification notes that driver honestly.",
+  "lead_weeks": 8,
+  "_lead_weeks_reasoning": "Public signals (news, filings) typically precede visible price tightening by ~1-2 months; 8 weeks of pre-start labeling captures that lead-in. Applies to `episodes` (tightening) only — negative_periods are labeled exactly over their stated window with no lead.",
+  "episodes": [
+    {
+      "resource_id": "dram",
+      "episode_name": "2024-2025 AI-driven DRAM tightening",
+      "start_date": "2024-03-01",
+      "end_date": "2025-06-30",
+      "approximate": true,
+      "justification": "Server/DDR5 DRAM contract prices rose sharply through 2024-2025 as memory makers diverted wafer capacity toward HBM for AI datacenters, tightening conventional DRAM supply."
+    },
+    {
+      "resource_id": "hbm",
+      "episode_name": "2024-2025 HBM sold-out tightening",
+      "start_date": "2024-01-01",
+      "end_date": "2025-12-31",
+      "approximate": true,
+      "justification": "HBM3/HBM3E was effectively sold out through 2024 into 2025 as AI-accelerator demand outran the combined HBM capacity of SK Hynix, Samsung, and Micron."
+    },
+    {
+      "resource_id": "gpu",
+      "episode_name": "2023-2025 AI-accelerator allocation constraint",
+      "start_date": "2023-05-01",
+      "end_date": "2025-06-30",
+      "approximate": true,
+      "justification": "Demand for H100-class AI GPUs vastly exceeded supply constrained by TSMC CoWoS advanced packaging and HBM availability, forcing multi-quarter customer allocation from 2023 onward."
+    },
+    {
+      "resource_id": "nand",
+      "episode_name": "2024H2-2025 NAND supply-cut recovery tightening",
+      "start_date": "2024-10-01",
+      "end_date": "2025-06-30",
+      "approximate": true,
+      "justification": "NAND flash contract prices recovered sharply from late 2024 into 2025 as Samsung, SK Hynix and Micron held deep wafer-output cuts while enterprise/AI-server SSD demand rose, tightening NAND supply after the 2023 glut (driven by supply discipline plus AI-SSD demand, not pure AI-demand pull like HBM/GPU)."
+    }
+  ],
+  "negative_periods": [
+    {
+      "resource_id": "dram",
+      "period_name": "2023 DRAM oversupply / downturn",
+      "start_date": "2023-01-01",
+      "end_date": "2023-09-30",
+      "approximate": true,
+      "justification": "Through most of 2023 DRAM was in severe oversupply with weak PC/smartphone demand and bloated inventories, driving contract prices down for consecutive quarters — a clearly NON-tightening (loosening) period before the 2024 AI-driven reversal."
+    },
+    {
+      "resource_id": "nand",
+      "period_name": "2023 NAND glut",
+      "start_date": "2023-01-01",
+      "end_date": "2023-09-30",
+      "approximate": true,
+      "justification": "NAND flash was in a deep glut through 2023 with double-digit quarterly price declines that forced industry-wide production cuts — an unambiguously non-tightening period."
+    }
+  ]
+}

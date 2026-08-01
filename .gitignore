@@ -1,0 +1,44 @@
+# ── Secrets — never commit ──────────────────────────
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets*
+**/credentials.json
+
+# ── Python ──────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# ── OS / editor ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Scratch / logs ──────────────────────────────────
+scratchpad/
+*.log
+
+# ── Streamlit local ─────────────────────────────────
+.streamlit/secrets.toml
+
+# ── Binary databases & vector store (regenerable) ───
+*.db
+*.sqlite3
+data/chroma/
+
+# ── DB backups ──────────────────────────────────────
+backups/
+
+# ── Trained model artifacts (regenerable, large binaries) ──
+models/
+*.pkl
+
+# ── Design-review internal ──────────────────────────
+.impeccable/

@@ -1,0 +1,65 @@
+{
+  "_notes": "Country shares, HHI, and lead times are best-estimate figures from general memory-market knowledge, not an audited dataset. HS codes: DRAM/HBM/NAND all share subheading 8542.32 (memories) at the 6-digit level. GPU country share reflects DESIGN concentration (US); fabrication is Taiwan-concentrated (TSMC) — see per-resource note.",
+  "resources": [
+    {
+      "resource_id": "dram",
+      "name": "DRAM",
+      "category": "volatile_memory",
+      "hs_codes": ["8542.32"],
+      "aliases": ["DRAM", "Dynamic RAM", "Dynamic Random-Access Memory", "DDR", "DDR5", "system memory"],
+      "substitutes": ["HBM", "GDDR (out-of-set)"],
+      "top_producing_countries": [
+        {"country": "South Korea", "share": 0.68},
+        {"country": "United States", "share": 0.25},
+        {"country": "China", "share": 0.05},
+        {"country": "Taiwan", "share": 0.02}
+      ],
+      "expansion_lead_time_months": 30,
+      "note": "Producers: Samsung, SK Hynix (KR); Micron (US); CXMT (CN, emerging)."
+    },
+    {
+      "resource_id": "hbm",
+      "name": "HBM",
+      "category": "volatile_memory",
+      "hs_codes": ["8542.32"],
+      "aliases": ["HBM", "High Bandwidth Memory", "HBM2E", "HBM3", "HBM3E", "stacked DRAM"],
+      "substitutes": ["DRAM", "GDDR (out-of-set)"],
+      "top_producing_countries": [
+        {"country": "South Korea", "share": 0.90},
+        {"country": "United States", "share": 0.10}
+      ],
+      "expansion_lead_time_months": 24,
+      "note": "Heavily TSV/packaging-constrained; SK Hynix leads, Samsung + Micron follow."
+    },
+    {
+      "resource_id": "nand",
+      "name": "NAND",
+      "category": "non_volatile_memory",
+      "hs_codes": ["8542.32"],
+      "aliases": ["NAND", "NAND flash", "NAND Flash Memory", "3D NAND", "flash storage"],
+      "substitutes": ["HDD (out-of-set)", "3D XPoint / Optane (discontinued)"],
+      "top_producing_countries": [
+        {"country": "South Korea", "share": 0.50},
+        {"country": "Japan", "share": 0.30},
+        {"country": "United States", "share": 0.15},
+        {"country": "China", "share": 0.05}
+      ],
+      "expansion_lead_time_months": 30,
+      "note": "No in-set substitute (non-volatile storage). Real alternatives are out-of-set (HDD)."
+    },
+    {
+      "resource_id": "gpu",
+      "name": "GPUs",
+      "category": "ai_accelerator",
+      "hs_codes": ["8542.31", "8473.30"],
+      "aliases": ["GPU", "GPUs", "AI accelerator", "Graphics Processing Unit", "data center GPU", "AI GPU"],
+      "substitutes": ["TPU (out-of-set)", "ASIC (out-of-set)", "FPGA (out-of-set)"],
+      "top_producing_countries": [
+        {"country": "United States", "share": 0.90},
+        {"country": "Other", "share": 0.10}
+      ],
+      "expansion_lead_time_months": 18,
+      "note": "Share reflects DESIGN concentration (US: Nvidia/AMD). FABRICATION is Taiwan-concentrated (TSMC) — dual-natured, flagged intentionally."
+    }
+  ]
+}

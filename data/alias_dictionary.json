@@ -1,0 +1,67 @@
+{
+  "producers": [
+    {
+      "producer_id": "samsung",
+      "canonical_name": "Samsung",
+      "tickers": ["005930.KS", "SSNLF"],
+      "aliases": [
+        "Samsung",
+        "Samsung Electronics",
+        "Samsung Electronics Co., Ltd.",
+        "Samsung Semiconductor",
+        "005930.KS",
+        "SSNLF"
+      ]
+    },
+    {
+      "producer_id": "sk_hynix",
+      "canonical_name": "SK Hynix",
+      "tickers": ["000660.KS"],
+      "aliases": [
+        "SK Hynix",
+        "SK hynix",
+        "SK Hynix Inc.",
+        "Hynix",
+        "Hynix Semiconductor",
+        "000660.KS"
+      ]
+    },
+    {
+      "producer_id": "micron",
+      "canonical_name": "Micron",
+      "tickers": ["MU"],
+      "aliases": [
+        "Micron",
+        "Micron Technology",
+        "Micron Technology, Inc.",
+        "Crucial",
+        "MU"
+      ]
+    },
+    {
+      "producer_id": "nvidia",
+      "canonical_name": "Nvidia",
+      "tickers": ["NVDA"],
+      "aliases": [
+        "Nvidia",
+        "NVIDIA",
+        "NVIDIA Corporation",
+        "NVIDIA Corp.",
+        "NVDA"
+      ]
+    },
+    {
+      "producer_id": "tsmc",
+      "canonical_name": "TSMC",
+      "tickers": ["TSM", "2330.TW"],
+      "aliases": [
+        "TSMC",
+        "Taiwan Semiconductor",
+        "Taiwan Semiconductor Manufacturing Company",
+        "Taiwan Semiconductor Manufacturing Co., Ltd.",
+        "TSM",
+        "2330.TW"
+      ]
+    }
+  ]
+}
