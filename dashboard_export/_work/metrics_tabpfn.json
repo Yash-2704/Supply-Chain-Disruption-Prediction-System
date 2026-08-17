@@ -6,5 +6,5 @@
   "roc_auc": 0.7653718091009989,
   "pr_auc": 0.6952732789484258,
   "model": "TabPFN",
-  "train_time_s": 576.565
+  "train_time_s": 6.17
 }

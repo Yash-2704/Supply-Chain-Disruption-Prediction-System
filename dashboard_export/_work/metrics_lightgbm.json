@@ -6,5 +6,5 @@
   "roc_auc": 0.8170921198668147,
   "pr_auc": 0.788616969555681,
   "model": "LightGBM",
-  "train_time_s": 33.403
+  "train_time_s": 0.571
 }

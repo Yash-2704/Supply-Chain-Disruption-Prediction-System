@@ -42,3 +42,8 @@ models/
 
 # ── Design-review internal ──────────────────────────
 .impeccable/
+
+# Local tooling config & runtime pipeline state (not for the public repo)
+.claude/
+dashboard_export/_pipeline/
+latex_source.zip

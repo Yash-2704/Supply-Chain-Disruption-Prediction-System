@@ -54,6 +54,10 @@ class FTTransformerModel:
         self.model = None
         self.scaler = None
         self._fallback = False
+        # Per-epoch (train_loss, val_loss) — populated by fit(), read by
+        # scripts/generate_model_curves.py to plot the training curve. Empty
+        # list on the MLP fallback path (no epoch-level BCE loss exposed there).
+        self.history = {"epoch": [], "train_loss": [], "val_loss": []}
 
     def fit(self, X_train, y_train):
         X_train = np.asarray(X_train, dtype=np.float32)
@@ -91,13 +95,18 @@ class FTTransformerModel:
         best_val, patience, bad, best_state = float("inf"), 5, 0, None
         for epoch in range(1, p["epochs"] + 1):
             model.train()
+            epoch_losses = []
             for xb, yb in loader:
                 logits = model(torch.empty(xb.size(0), 0, dtype=torch.long), xb)
                 loss = criterion(logits, yb)
                 optimizer.zero_grad(); loss.backward(); optimizer.step()
+                epoch_losses.append(loss.item())
             model.eval()
             with torch.no_grad():
                 vloss = criterion(model(torch.empty(t_Xval.size(0), 0, dtype=torch.long), t_Xval), t_yval).item()
+            self.history["epoch"].append(epoch)
+            self.history["train_loss"].append(float(np.mean(epoch_losses)))
+            self.history["val_loss"].append(float(vloss))
             if vloss < best_val:
                 best_val, bad = vloss, 0
                 best_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}

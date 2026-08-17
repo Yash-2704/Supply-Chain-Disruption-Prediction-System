@@ -21,7 +21,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import db_init  # noqa: E402
-from ingestion import yfinance_client, macro_price_client  # noqa: E402
+from ingestion import yfinance_client  # noqa: E402
+# NOTE: `macro_price_client` is imported lazily inside ingest_macro_context() so
+# that the price-only fast path (--no-macro, used by the dashboard's live fetch)
+# does not pay the cost of importing `requests`/`openpyxl` — a large chunk of the
+# cold-start import time on a slow disk.
 
 ALIAS_DICT_PATH = PROJECT_ROOT / "data" / "alias_dictionary.json"
 LOOKBACK_DAYS = 90
@@ -100,6 +104,7 @@ def ingest_stock_proxies(conn, producers, existing_keys, ingested_at):
 
 def ingest_macro_context(conn, existing_keys, ingested_at):
     print("\n--- PART B: macro commodity context (World Bank Pink Sheet) ---")
+    from ingestion import macro_price_client  # lazy: see import note at top
     rows = macro_price_client.get_latest_prices(months_back=MACRO_MONTHS)
     source = macro_price_client.SOURCE_NAME
     print(f"[macro {source}] fetched={len(rows)} monthly rows from World Bank Pink Sheet")
@@ -152,7 +157,13 @@ def ingest_macro_context(conn, existing_keys, ingested_at):
     print(f"[macro {source}] inserted={inserted} skipped={skipped}")
 
 
-def run(db_path=None):
+def run(db_path=None, include_macro=True):
+    """Ingest market data. Part A (producer stock proxies) always runs; it is the
+    only part scoring uses and the only part that actually inserts rows. Part B
+    (World Bank macro context) is optional: it is slow (large .xlsx download +
+    parse) and currently inserts nothing (blocked by the resource_id NOT NULL
+    schema), so the dashboard's live fetch runs with include_macro=False to stay
+    well inside its time budget."""
     conn = db_init.get_connection(db_path)
     try:
         producers = load_producers(conn)
@@ -160,11 +171,23 @@ def run(db_path=None):
         ingested_at = datetime.now(timezone.utc).isoformat()
         print("=" * 64)
         ingest_stock_proxies(conn, producers, existing_keys, ingested_at)
-        ingest_macro_context(conn, existing_keys, ingested_at)
+        if include_macro:
+            ingest_macro_context(conn, existing_keys, ingested_at)
+        else:
+            print("\n--- PART B: macro commodity context — skipped (--no-macro) ---")
         print("=" * 64)
     finally:
         conn.close()
 
 
 if __name__ == "__main__":
-    run()
+    import argparse
+    import os
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--no-macro", action="store_true",
+        help="Skip the slow World Bank macro fetch (Part B); ingest producer "
+             "prices only. Also enabled by env INGEST_SKIP_MACRO=1.")
+    args = parser.parse_args()
+    include_macro = not (args.no_macro or os.environ.get("INGEST_SKIP_MACRO") == "1")
+    run(include_macro=include_macro)

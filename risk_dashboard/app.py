@@ -31,6 +31,7 @@ from risk_dashboard.config import (
     DASHBOARD_TITLE, DASHBOARD_SUBTITLE, PROCESSED_DATA_DIR, OUTPUTS_DIR,
     pretty_feature, feature_unit,
 )
+from risk_dashboard import pipeline_runner as pipeline
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -294,7 +295,9 @@ h2.section-header .shi svg { width: 19px; height: 19px; }
 .stButton button, .stDownloadButton button { min-height: 44px; border-radius: 10px; font-weight: 600; }
 .block-container .stDownloadButton button { background: var(--brand); color: #fff !important; border: 1px solid var(--brand); }
 .block-container .stDownloadButton button:hover { background: var(--brand-ink); border-color: var(--brand-ink); }
-.block-container .stButton button { border: 1px solid var(--border); }
+.block-container .stButton button { border: 1px solid var(--border);
+    background: var(--surface); color: var(--ink) !important; }
+.block-container .stButton button:hover { border-color: var(--brand); color: var(--brand-ink) !important; }
 section[data-testid="stSidebar"] .stDownloadButton button { background: rgba(255,255,255,.07); color: #e8edf7 !important; border: 1px solid rgba(148,163,184,.3); }
 section[data-testid="stSidebar"] .stDownloadButton button:hover { background: rgba(99,102,241,.24); border-color: rgba(99,102,241,.6); }
 
@@ -302,6 +305,76 @@ section[data-testid="stSidebar"] .stDownloadButton button:hover { background: rg
     .hero { padding: 22px 20px; } .hero h1 { font-size: 24px; }
     .block-container { padding-top: 1.4rem; }
 }
+
+/* ── Pipeline run page ─────────────────────────────────────── */
+.pipe-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 10px; margin: 8px 0 14px;
+}
+@media (max-width: 900px) { .pipe-grid { grid-template-columns: repeat(2, 1fr); } }
+.pipe-stage {
+    position: relative; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 12px 14px; text-align: center;
+    box-shadow: var(--shadow-sm); transition: border-color .3s, box-shadow .3s, transform .3s;
+}
+.pipe-stage .ico {
+    width: 46px; height: 46px; margin: 0 auto 10px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #94a3b8; background: #eef1f7; transition: all .35s;
+}
+.pipe-stage .ico svg { width: 24px; height: 24px; }
+.pipe-stage .nm { font-weight: 700; font-size: 13px; color: var(--ink); }
+.pipe-stage .dt { font-size: 10.5px; color: var(--muted); margin-top: 5px; line-height: 1.35;
+    min-height: 26px; }
+.pipe-stage .badge {
+    position: absolute; top: 8px; right: 10px; font-size: 10px; font-weight: 700;
+    letter-spacing: .3px; text-transform: uppercase; color: #94a3b8;
+}
+/* pending */
+.pipe-stage.pending { opacity: .72; }
+/* active — pulsing glowing ring + gentle bob */
+.pipe-stage.active { border-color: var(--brand); box-shadow: 0 8px 22px rgba(79,70,229,.18);
+    transform: translateY(-2px); }
+.pipe-stage.active .ico {
+    color: #fff; background: var(--brand);
+    animation: pipePulse 1.15s ease-in-out infinite;
+}
+.pipe-stage.active .badge { color: var(--brand-ink); }
+.pipe-stage.active .ico svg { animation: pipeSpin 1.4s linear infinite; }
+@keyframes pipePulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(79,70,229,.45); }
+    50%     { box-shadow: 0 0 0 10px rgba(79,70,229,0); }
+}
+@keyframes pipeSpin { to { transform: rotate(360deg); } }
+/* done */
+.pipe-stage.done .ico { color: #fff; background: #16a34a; animation: pipePop .4s ease; }
+.pipe-stage.done .badge { color: #15803d; }
+@keyframes pipePop { 0% { transform: scale(.6); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+/* skipped / error */
+.pipe-stage.skipped .ico { color: #b45309; background: #fef3c7; }
+.pipe-stage.skipped .badge { color: #b45309; }
+.pipe-stage.error .ico { color: #fff; background: #dc2626; }
+.pipe-stage.error .badge { color: #b91c1c; }
+/* progress rail */
+.pipe-rail { height: 6px; border-radius: 6px; background: #e5e9f0; overflow: hidden; margin: 4px 0 18px; }
+.pipe-rail > span { display: block; height: 100%; background: linear-gradient(90deg,#6366f1,#4f46e5);
+    border-radius: 6px; transition: width .5s ease; }
+.pipe-scorecard {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; box-shadow: var(--shadow-sm); text-align: center;
+}
+.pipe-scorecard .val { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pipe-scorecard .lab { font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.pipe-scorecard .nm { font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+.train-row { display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:var(--surface);
+    margin-bottom:8px; }
+.train-row .tid { font-family: var(--mono); font-size:12px; color: var(--muted); }
+.train-dot { width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:7px; }
+.train-dot.running { background:#4f46e5; animation: pipePulse 1.15s infinite; }
+.train-dot.queued { background:#f59e0b; }
+.train-dot.done { background:#16a34a; }
+.train-dot.error { background:#dc2626; }
 </style>
 """
 
@@ -325,6 +398,21 @@ UI_SVG = {
 def sec(icon: str, text: str) -> str:
     """A real <h2> section heading with an inline icon (screen-reader navigable)."""
     return f'<h2 class="section-header"><span class="shi">{UI_SVG.get(icon, "")}</span>{text}</h2>'
+
+
+# Pipeline-stage icons (keys match pipeline_runner.STAGES).
+STAGE_SVG = {
+    "ingest": _svg('<path d="M12 3v11M8 10l4 4 4-4"/><path d="M4 21h16"/>'),          # download into store
+    "brain":  _svg('<path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-1 5 3 3 0 0 0 2 4 3 3 0 0 0 5 1V4z"/>'
+                   '<path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 1 5 3 3 0 0 1-2 4 3 3 0 0 1-5 1"/>'),  # brain
+    "gear":   _svg('<circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3'
+                   'M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'),                        # gear
+    "tag":    _svg('<path d="M3 12l9-9 9 9-9 9z"/><circle cx="9" cy="9" r="1.3"/>'),   # label/tag
+    "target": _svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/>'
+                   '<circle cx="12" cy="12" r="1"/>'),                                  # target
+    "lens":   _svg('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>'),      # magnifier
+    "ship":   _svg('<path d="M3 14l9 5 9-5"/><path d="M3 10l9 5 9-5-9-5z"/>'),         # deliver/stack
+}
 
 
 # Brand mark — interlocked links (supply chain), drawn not emoji.
@@ -1147,10 +1235,141 @@ def page_case_studies():
 #  MAIN — SIDEBAR NAVIGATION
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+def _stage_badge_word(status: str) -> str:
+    return {"pending": "waiting", "active": "running", "done": "done",
+            "skipped": "skipped", "error": "failed"}.get(status, status)
+
+
+def page_run_pipeline():
+    """Live pipeline run: fast inference with the CURRENT models (real score in
+    seconds) while model training is dispatched to a background queue. The page
+    polls the runner and animates each stage as it advances."""
+    import time as _time
+
+    st.markdown(
+        '<div class="hero"><h1>Pipeline Run</h1>'
+        '<p>Scoring with the current models now — retraining runs in the background.</p></div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.button("←  Back to dashboard"):
+        st.session_state["view"] = "nav"
+        st.rerun()
+
+    run = pipeline.get_run()
+    if run is None:
+        st.info("No run yet. Press **Run Pipeline** in the sidebar to start one.")
+        return
+
+    stages = run["stages"]
+    done_like = sum(1 for s in stages if s["status"] in ("done", "skipped", "error"))
+    pct = int(done_like / len(stages) * 100)
+
+    # Progress rail
+    st.markdown(f'<div class="pipe-rail"><span style="width:{pct}%"></span></div>',
+                unsafe_allow_html=True)
+
+    # Stage grid
+    cards = ""
+    for s in stages:
+        icon = STAGE_SVG.get(s["icon"], "")
+        detail = s["detail"] or s["desc"]
+        cards += (
+            f'<div class="pipe-stage {s["status"]}">'
+            f'<div class="badge">{_stage_badge_word(s["status"])}</div>'
+            f'<div class="ico">{icon}</div>'
+            f'<div class="nm">{s["label"]}</div>'
+            f'<div class="dt">{detail}</div>'
+            f'</div>'
+        )
+    st.markdown(f'<div class="pipe-grid">{cards}</div>', unsafe_allow_html=True)
+
+    # Status line
+    if run["status"] == "running":
+        active = next((s["label"] for s in stages if s["status"] == "active"), "…")
+        st.markdown(f'<p style="color:var(--brand-ink); font-weight:700;">'
+                    f'● Running — {active}…</p>', unsafe_allow_html=True)
+    elif run["status"] == "error":
+        st.error(f"Run failed: {run.get('error')}")
+    else:
+        st.success("Inference complete — scores below are live from the current models.")
+
+    # Score cards (as soon as Predict has produced them)
+    scores = run.get("scores") or {}
+    if scores:
+        st.markdown(sec("scores", "Risk Score — current models"), unsafe_allow_html=True)
+        cols = st.columns(len(scores))
+        for col, res in zip(cols, [r for r in RESOURCES if r in scores]):
+            val = float(scores[res])
+            color = risk_hex(val)
+            _, _, label = risk_color_class(val)
+            drv = (run.get("drivers") or {}).get(res) or []
+            drv_txt = (" · ".join(pretty_feature(d["feature"]) for d in drv[:2])
+                       if drv else "")
+            with col:
+                st.markdown(
+                    f'<div class="pipe-scorecard">'
+                    f'<div class="nm">{res}</div>'
+                    f'<div class="val" style="color:{color}">{val:.2f}</div>'
+                    f'<div class="lab" style="color:{color}">{label}</div>'
+                    + (f'<div style="font-size:10.5px;color:var(--muted);margin-top:8px;">'
+                       f'drivers: {drv_txt}</div>' if drv_txt else "")
+                    + '</div>',
+                    unsafe_allow_html=True,
+                )
+
+    # Background training panel
+    snap = pipeline.training_snapshot()
+    st.markdown(sec("cube", "Background training"), unsafe_allow_html=True)
+    if not snap["current"] and not snap["queued"] and not snap["history"]:
+        st.caption("No training jobs yet.")
+    else:
+        def _job_row(j, live=False):
+            status = j["status"]
+            extra = ""
+            if status == "queued":
+                extra = "waiting in queue"
+            elif status == "running":
+                extra = "training 4 models in a subprocess…"
+            elif status == "done":
+                extra = "models refreshed"
+            elif status == "error":
+                extra = f"exit {j.get('returncode')}"
+            return (f'<div class="train-row"><span><span class="train-dot {status}"></span>'
+                    f'<b>{status.title()}</b> <span class="tid">{j["id"]}</span></span>'
+                    f'<span style="font-size:12px;color:var(--muted);">{extra}</span></div>')
+        html = ""
+        if snap["current"]:
+            html += _job_row(snap["current"], live=True)
+        for j in snap["queued"]:
+            html += _job_row(j)
+        for j in snap["history"]:
+            html += _job_row(j)
+        st.markdown(html, unsafe_allow_html=True)
+        st.caption("Jobs run one at a time — repeat runs queue behind the current job. "
+                   "Scores above already reflect the current models; training refines them.")
+
+    # Auto-refresh while anything is in flight (poll the background threads).
+    if run["status"] == "running" or snap["current"] or snap["queued"]:
+        _time.sleep(0.8)
+        st.rerun()
+    else:
+        # Freshly-finished run: clear cached loaders so the other pages show the
+        # new scores immediately.
+        if st.session_state.get("_pipe_last_cleared") != run["run_id"]:
+            st.cache_data.clear()
+            st.session_state["_pipe_last_cleared"] = run["run_id"]
+
+
 def main():
     """Main entry point with sidebar navigation."""
     # Inject custom CSS
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+
+    # A fresh session (e.g. a browser refresh) that opens while a run is in
+    # flight should land on the live run view rather than the default page.
+    if "view" not in st.session_state and pipeline.is_running():
+        st.session_state["view"] = "run"
 
     # Sidebar
     with st.sidebar:
@@ -1166,11 +1385,37 @@ def main():
 
         st.markdown("---")
 
+        # ── Run Pipeline button ──────────────────────────────────
+        run_state = pipeline.get_run()
+        running = bool(run_state and run_state["status"] == "running")
+        btn_label = "Running…" if running else "▶  Run Pipeline"
+        if st.button(btn_label, use_container_width=True, type="primary", disabled=running):
+            # Each click enqueues its OWN training job (so repeat clicks queue up),
+            # then starts a fast inference run that reuses the current models.
+            job = pipeline.enqueue_training(source_run="ui")
+            pipeline.start_run(live_ingest=st.session_state.get("live_ingest", False),
+                               training_job_id=job["id"])
+            st.session_state["view"] = "run"
+            st.rerun()
+        st.checkbox("Fetch live data first", key="live_ingest",
+                    help="Attempt a live price pull before scoring (slower; falls "
+                         "back to cached data). Off = score from the current database.")
+
+        st.markdown("---")
+
+        _nav_options = ["Risk Overview", "Model Performance", "Explainability", "Case Studies"]
+        st.session_state.setdefault("nav_page", _nav_options[0])
+        st.session_state.setdefault("prev_nav", st.session_state["nav_page"])
+
         page = st.radio(
-            "Navigation",
-            ["Risk Overview", "Model Performance", "Explainability", "Case Studies"],
+            "Navigation", _nav_options, key="nav_page",
             label_visibility="collapsed",
         )
+        # Detect a *real* nav change (prev_nav is seeded to the current value, so
+        # this never false-fires on the rerun that opens the run view).
+        if st.session_state["nav_page"] != st.session_state["prev_nav"]:
+            st.session_state["prev_nav"] = st.session_state["nav_page"]
+            st.session_state["view"] = "nav"
 
         st.markdown("---")
 
@@ -1211,8 +1456,10 @@ def main():
             unsafe_allow_html=True,
         )
 
-    # Page routing
-    if page == "Risk Overview":
+    # Page routing — the live run view takes precedence until the user navigates.
+    if st.session_state.get("view") == "run":
+        page_run_pipeline()
+    elif page == "Risk Overview":
         page_risk_overview()
     elif page == "Model Performance":
         page_model_performance()

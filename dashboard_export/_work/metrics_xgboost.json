@@ -6,5 +6,5 @@
   "roc_auc": 0.8665926748057713,
   "pr_auc": 0.7931318982259388,
   "model": "XGBoost",
-  "train_time_s": 2.115
+  "train_time_s": 0.347
 }
