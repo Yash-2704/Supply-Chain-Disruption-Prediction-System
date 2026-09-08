@@ -6,11 +6,35 @@ dashboard_ui.formatters. No SQL, no invented scoring, no hardcoded resource slug
 import sys
 from pathlib import Path
 
+import os
+import sqlite3
 import plotly.graph_objects as go
 import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+
+# Load Streamlit Secrets into os.environ if present
+try:
+    for key, val in st.secrets.items():
+        if isinstance(val, str):
+            os.environ.setdefault(key, val)
+except Exception:
+        pass
+
+import db_init
+
+def ensure_db_ready():
+    """Ensure database file and schema exist on Streamlit Cloud."""
+    try:
+        conn = db_init.get_connection()
+        conn.execute("SELECT 1 FROM resource LIMIT 1;")
+        conn.close()
+    except Exception:
+        db_init.init_db()
+
+ensure_db_ready()
+
 
 from dashboard_data.queries import (  # noqa: E402
     get_all_resources, get_alert_feed, get_leaderboard, get_resource_detail,
