@@ -15,8 +15,18 @@ import os
 from pathlib import Path
 
 import streamlit as st
+
+# Load Streamlit Secrets into os.environ if present
+try:
+    for key, val in st.secrets.items():
+        if isinstance(val, str):
+            os.environ.setdefault(key, val)
+except Exception:
+    pass
+
 import pandas as pd
 import numpy as np
+
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
